@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+  <head>
+  </head>
+  <body>
+
+    <audio controls="controls" type="audio/mp3" id="audio_player">
+    </audio>
+    <a download="audio.mp3" id="audio_download" href="#">Download song</a>
+    <!-- <button onclick="javascript:window.init()"> Call API</button> -->
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/socket.io-client@2/dist/socket.io.js"> </script>
+    <script>
+      $(function () {
+        var socket = io('http://localhost:5000');
+        let blob_parts = []
+        socket.on('connect', function() {
+            console.log('socket connected')
+        });
+        socket.on('disconnect', function() {
+            console.log('Socket disconnected')
+        });
+        socket.emit('send_slice')
+        socket.on('receive_slice', (data) => {
+          console.log('got data')
+          let blob = new Blob([data], {type: 'audio/wav'});
+          blob_parts.push(blob)
+        });
+
+        socket.on('end_of_file', () => {
+          console.log('end_of_file')
+          let blob = new Blob(blob_parts, {type: 'audio/mp3'});
+          let url = (URL || webkitURL).createObjectURL(blob)
+          let play_element = document.getElementById('audio_player')
+          play_element.src = url
+          let download_element = document.getElementById('audio_download')
+          download_element.href = url
+        })
+
+      });
+    </script>
+  
+  </body>
+</html>
