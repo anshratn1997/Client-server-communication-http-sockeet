@@ -23,7 +23,7 @@
         socket.emit('send_slice')
         socket.on('receive_slice', (data) => {
           console.log('got data')
-          let blob = new Blob([data], {type: 'audio/wav'});
+          let blob = new Blob([data], {type: 'audio/mp3'});
           blob_parts.push(blob)
         });
 
